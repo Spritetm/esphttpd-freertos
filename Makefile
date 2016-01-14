@@ -15,6 +15,20 @@ TARGET = eagle
 #FLAVOR = release
 FLAVOR = debug
 
+BOOT=new
+APP=1
+SPI_SPEED=40
+SPI_MODE=QIO
+SPI_SIZE_MAP=6
+
+
+ESPTOOL ?= esptool.py
+ESPPORT ?= /dev/ttyUSB0
+ESPDELAY	?= 3
+ESPBAUD		?= 460800
+
+ESPTOOL_OPTS=--port $(ESPPORT) --baud $(ESPBAUD)
+
 #EXTRA_CCFLAGS += -u
 
 ifndef PDIR # {
@@ -23,7 +37,6 @@ GEN_BINS= eagle.app.v6.bin
 SPECIAL_MKTARGETS=$(APP_MKTARGETS)
 SUBDIRS=    \
 	user    \
-	sample_lib
 
 endif # } PDIR
 
@@ -38,16 +51,27 @@ TARGET_LDFLAGS =		\
 	--text-section-literals
 
 ifeq ($(FLAVOR),debug)
-    TARGET_LDFLAGS += -g -O2
+    TARGET_LDFLAGS += -ggdb -O2
 endif
 
 ifeq ($(FLAVOR),release)
     TARGET_LDFLAGS += -g -O0
 endif
 
+dummy: all
+
+libesphttpd/libesphttpd.a: libesphttpd/Makefile
+	make -C libesphttpd libesphttpd.a FREERTOS=yes
+
+libesphttpd/libwebpages-espfs.a: libesphttpd/Makefile
+	make -C libesphttpd libwebpages-espfs.a FREERTOS=yes
+
+flash: $(TARGET_OUT)
+	$(ESPTOOL) $(ESPTOOL_OPTS) write_flash $(ESPTOOL_FLASHDEF) 0x00000 "$(SDK_BASE)/bin/boot_v1.4(b1).bin" 0x1000 $(BIN_PATH)/upgrade/$(BIN_NAME).bin
+
 COMPONENTS_eagle.app.v6 = \
-	user/libuser.a  \
-	sample_lib/libsample.a
+	user/libuser.a
+
 
 LINKFLAGS_eagle.app.v6 = \
 	-L$(SDK_PATH)/lib        \
@@ -69,12 +93,18 @@ LINKFLAGS_eagle.app.v6 = \
 	-lmain	\
 	-lfreertos	\
 	-llwip	\
+	-L./libesphttpd \
+	-lesphttpd \
+	-lwebpages-espfs \
 	$(DEP_LIBS_eagle.app.v6)					\
-	-Wl,--end-group
+	-Wl,--end-group \
+	-Wl,-Map=mapfile.txt
 
 DEPENDS_eagle.app.v6 = \
                 $(LD_FILE) \
-                $(LDDIR)/eagle.rom.addr.v6.ld
+                $(LDDIR)/eagle.rom.addr.v6.ld \
+				libesphttpd/libesphttpd.a \
+				libesphttpd/libwebpages-espfs.a
 
 #############################################################
 # Configuration i.e. compile options etc.
@@ -90,7 +120,7 @@ DEPENDS_eagle.app.v6 = \
 #	-DTXRX_TXBUF_DEBUG
 #	-DTXRX_RXBUF_DEBUG
 #	-DWLAN_CONFIG_CCX
-CONFIGURATION_DEFINES =	-DICACHE_FLASH
+CONFIGURATION_DEFINES =	-DICACHE_FLASH -DFREERTOS
 
 DEFINES +=				\
 	$(UNIVERSAL_TARGET_DEFINES)	\
@@ -113,7 +143,7 @@ DDEFINES +=				\
 # Required for each makefile to inherit from the parent
 #
 
-INCLUDES := $(INCLUDES) -I $(PDIR)include
+INCLUDES := $(INCLUDES) -I $(PDIR)include -I $(PDIR)libesphttpd/include -I $(PDIR)libesphttpd/espfs
 sinclude $(SDK_PATH)/Makefile
 
 .PHONY: FORCE
