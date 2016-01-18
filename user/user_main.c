@@ -49,6 +49,41 @@ int myPassFn(HttpdConnData *connData, int no, char *user, int userLen, char *pas
 	return 0;
 }
 
+
+static os_timer_t websockTimer;
+
+//Broadcast the uptime in seconds every second over connected websockets
+/*
+This Does Not Work under Freertos, presumably because this can be called in any random Freertos
+context. The correct way to fix this would be to use a queue to do inter-task communications between
+the webserver and other tasks. That's not supported under esphttpd yet, unfortunately. For now, this
+code is disabled and similar code won't work. If you know of a way to fix this in a simple way, feel
+free to poke me - Jeroen
+*/
+static void websockTimerCb(void *arg) {
+	static int ctr=0;
+	char buff[128];
+	ctr++;
+	sprintf(buff, "Up for %d minutes %d seconds!\n", ctr/60, ctr%60);
+	cgiWebsockBroadcast("/websocket/ws.cgi", buff, strlen(buff), WEBSOCK_FLAG_NONE);
+}
+
+//On reception of a message, send "You sent: " plus whatever the other side sent
+static void myWebsocketRecv(Websock *ws, char *data, int len, int flags) {
+	int i;
+	char buff[128];
+	sprintf(buff, "You sent: ");
+	for (i=0; i<len; i++) buff[i+10]=data[i];
+	buff[i+10]=0;
+	cgiWebsocketSend(ws, buff, strlen(buff), WEBSOCK_FLAG_NONE);
+}
+
+//Websocket connected. Install reception handler and send welcome message.
+static void myWebsocketConnect(Websock *ws) {
+	ws->recvCb=myWebsocketRecv;
+	cgiWebsocketSend(ws, "Hi, Websocket!", 14, WEBSOCK_FLAG_NONE);
+}
+
 /*
 This is the main url->function dispatching data struct.
 In short, it's a struct with various URLs plus their handlers. The handlers can
@@ -82,6 +117,8 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"/wifi/connstatus.cgi", cgiWiFiConnStatus, NULL},
 	{"/wifi/setmode.cgi", cgiWiFiSetMode, NULL},
 
+	{"/websocket/ws.cgi", cgiWebsocket, myWebsocketConnect},
+
 	{"*", cgiEspFsHook, NULL}, //Catch-all cgi function for the filesystem
 	{NULL, NULL, NULL}
 };
@@ -95,5 +132,12 @@ void user_init(void) {
 
 	espFsInit((void*)(webpages_espfs_start));
 	httpdInit(builtInUrls, 80);
+
+/*
+	os_timer_disarm(&websockTimer);
+	os_timer_setfn(&websockTimer, websockTimerCb, NULL);
+	os_timer_arm(&websockTimer, 1000, 1);
+*/
+
 	printf("\nReady\n");
 }
