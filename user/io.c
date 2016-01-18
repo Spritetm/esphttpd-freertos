@@ -14,7 +14,7 @@
 #define LEDGPIO 2
 #define BTNGPIO 0
 
-//static ETSTimer resetBtntimer;
+static os_timer_t resetBtntimer;
 
 void ioLed(int ena) {
 	//gpio_output_set is overkill. ToDo: use better mactos
@@ -25,10 +25,9 @@ void ioLed(int ena) {
 	}
 }
 
-/*
 static void resetBtnTimerCb(void *arg) {
 	static int resetCnt=0;
-	if (!GPIO_INPUT_GET(BTNGPIO)) {
+	if ((GPIO_REG_READ(GPIO_IN_ADDRESS)&(1<<BTNGPIO))==0) {
 		resetCnt++;
 	} else {
 		if (resetCnt>=6) { //3 sec pressed
@@ -40,14 +39,14 @@ static void resetBtnTimerCb(void *arg) {
 		resetCnt=0;
 	}
 }
-*/
+
 
 void ioInit() {
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);
 	gpio_output_set(0, 0, (1<<LEDGPIO), (1<<BTNGPIO));
-//	os_timer_disarm(&resetBtntimer);
-//	os_timer_setfn(&resetBtntimer, resetBtnTimerCb, NULL);
-//	os_timer_arm(&resetBtntimer, 500, 1);
+	os_timer_disarm(&resetBtntimer);
+	os_timer_setfn(&resetBtntimer, resetBtnTimerCb, NULL);
+	os_timer_arm(&resetBtntimer, 500, 1);
 }
 

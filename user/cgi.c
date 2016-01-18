@@ -60,7 +60,7 @@ int ICACHE_FLASH_ATTR tplLed(HttpdConnData *connData, char *token, void **arg) {
 	return HTTPD_CGI_DONE;
 }
 
-static long hitCounter=0;
+static int hitCounter=0;
 
 //Template code for the counter on the index page.
 int ICACHE_FLASH_ATTR tplCounter(HttpdConnData *connData, char *token, void **arg) {
@@ -69,7 +69,7 @@ int ICACHE_FLASH_ATTR tplCounter(HttpdConnData *connData, char *token, void **ar
 
 	if (strcmp(token, "counter")==0) {
 		hitCounter++;
-		sprintf(buff, "%ld", hitCounter);
+		sprintf(buff, "%d", hitCounter);
 	}
 	httpdSend(connData, buff, -1);
 	return HTTPD_CGI_DONE;

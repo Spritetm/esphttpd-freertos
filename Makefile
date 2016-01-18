@@ -18,7 +18,7 @@ FLAVOR = debug
 BOOT=new
 APP=1
 SPI_SPEED=40
-SPI_MODE=QIO
+SPI_MODE=DIO
 SPI_SIZE_MAP=6
 
 
@@ -27,6 +27,14 @@ ESPPORT ?= /dev/ttyUSB0
 ESPDELAY	?= 3
 ESPBAUD		?= 460800
 
+
+define maplookup
+$(patsubst $(strip $(1)):%,%,$(filter $(strip $(1)):%,$(2)))
+endef
+
+ESPTOOL_SIZE=$(call maplookup,$(SPI_SIZE_MAP),0:4m 2:8m 3:16m 4:32m 5:16m 6:32m)
+ESPTOOL_MODE=$(call maplookup,$(SPI_MODE),QIO:qio QOUT:qout DIO:dio DOUT:dout)
+ESPTOOL_FLASHDEF=--flash_freq $(SPI_SPEED)m --flash_mode $(ESPTOOL_MODE) --flash_size $(ESPTOOL_SIZE)
 ESPTOOL_OPTS=--port $(ESPPORT) --baud $(ESPBAUD)
 
 #EXTRA_CCFLAGS += -u
@@ -39,6 +47,9 @@ SUBDIRS=    \
 	user    \
 
 endif # } PDIR
+
+
+
 
 LDDIR = $(SDK_PATH)/ld
 

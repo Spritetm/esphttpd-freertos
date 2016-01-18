@@ -86,45 +86,14 @@ HttpdBuiltInUrl builtInUrls[]={
 	{NULL, NULL, NULL}
 };
 
-#define AP_NAME "testjmd"
-#define AP_PASS "pannenkoek"
-
-//Simple task to connect to an access point, initialize i2s and fire up the reader task.
-void ICACHE_FLASH_ATTR tskconnect(void *pvParameters) {
-	//Wait a few secs for the stack to settle down
-	vTaskDelay(3000/portTICK_RATE_MS);
-	
-	//Go to station mode
-	wifi_station_disconnect();
-	if (wifi_get_opmode() != STATION_MODE) { 
-		wifi_set_opmode(STATION_MODE);
-	}
-
-	//Connect to the defined access point.
-	struct station_config *config=malloc(sizeof(struct station_config));
-	memset(config, 0x00, sizeof(struct station_config));
-	sprintf(config->ssid, AP_NAME);
-	sprintf(config->password, AP_PASS);
-	wifi_station_set_config(config);
-	wifi_station_connect();
-	free(config);
-
-	//We're done. Delete this task.
-	vTaskDelete(NULL);
-}
-
-
-
 //Main routine. Initialize stdout, the I/O, filesystem and the webserver and we're done.
 void user_init(void) {
-//	UART_SetBaudrate(0, 115200);
-    uart_div_modify(0, UART_CLK_FREQ / 115200);
+	uart_div_modify(0, UART_CLK_FREQ / 115200);
 
 	ioInit();
 	captdnsInit();
 
 	espFsInit((void*)(webpages_espfs_start));
 	httpdInit(builtInUrls, 80);
-	xTaskCreate(tskconnect, "tskconnect", 200, NULL, 3, NULL);
 	printf("\nReady\n");
 }
