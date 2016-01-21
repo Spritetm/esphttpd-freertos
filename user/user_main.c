@@ -84,6 +84,19 @@ static void myWebsocketConnect(Websock *ws) {
 	cgiWebsocketSend(ws, "Hi, Websocket!", 14, WEBSOCK_FLAG_NONE);
 }
 
+//On reception of a message, echo it back verbatim
+void myEchoWebsocketRecv(Websock *ws, char *data, int len, int flags) {
+	printf("EchoWs: echo, len=%d\n", len);
+	cgiWebsocketSend(ws, data, len, flags);
+}
+
+//Echo websocket connected. Install reception handler.
+void myEchoWebsocketConnect(Websock *ws) {
+	printf("EchoWs: connect\n");
+	ws->recvCb=myEchoWebsocketRecv;
+}
+
+
 /*
 This is the main url->function dispatching data struct.
 In short, it's a struct with various URLs plus their handlers. The handlers can
@@ -118,6 +131,7 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"/wifi/setmode.cgi", cgiWiFiSetMode, NULL},
 
 	{"/websocket/ws.cgi", cgiWebsocket, myWebsocketConnect},
+	{"/websocket/echo.cgi", cgiWebsocket, myEchoWebsocketConnect},
 
 	{"*", cgiEspFsHook, NULL}, //Catch-all cgi function for the filesystem
 	{NULL, NULL, NULL}
