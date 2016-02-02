@@ -19,7 +19,7 @@ BOOT=new
 APP=1
 SPI_SPEED=40
 SPI_MODE=DIO
-SPI_SIZE_MAP=5
+SPI_SIZE_MAP=4
 
 
 ESPTOOL ?= esptool.py
@@ -45,6 +45,7 @@ GEN_BINS= eagle.app.v6.bin
 SPECIAL_MKTARGETS=$(APP_MKTARGETS)
 SUBDIRS=    \
 	user    \
+	gdbstub
 
 endif # } PDIR
 
@@ -66,7 +67,7 @@ ifeq ($(FLAVOR),debug)
 endif
 
 ifeq ($(FLAVOR),release)
-    TARGET_LDFLAGS += -g -O0
+    TARGET_LDFLAGS += -ggdb -Og
 endif
 
 dummy: all
@@ -78,13 +79,14 @@ libesphttpd/libwebpages-espfs.a: libesphttpd/Makefile
 	make -C libesphttpd libwebpages-espfs.a FREERTOS=yes
 
 flash: $(GEN_IMAGES) $(TARGET_OUT)
-	$(ESPTOOL) $(ESPTOOL_OPTS) write_flash $(ESPTOOL_FLASHDEF) 0x00000 "$(SDK_BASE)/bin/boot_v1.4(b1).bin" 0x1000 $(BIN_PATH)/upgrade/$(BIN_NAME).bin
+	$(ESPTOOL) $(ESPTOOL_OPTS) write_flash $(ESPTOOL_FLASHDEF) 0x00000 "$(SDK_PATH)/bin/boot_v1.4(b1).bin" 0x1000 $(BIN_PATH)/upgrade/$(BIN_NAME).bin
 
 blankflash:
-	$(ESPTOOL) $(ESPTOOL_OPTS) write_flash $(ESPTOOL_FLASHDEF) 0xFE000 "$(SDK_BASE)/bin/blank.bin" 0xFF000 $(SDK_BASE)/bin/esp_init_data_default.bin
+	$(ESPTOOL) $(ESPTOOL_OPTS) write_flash $(ESPTOOL_FLASHDEF) 0xFE000 "$(SDK_PATH)/bin/blank.bin" 0xFF000 $(SDK_PATH)/bin/esp_init_data_default.bin
 
 COMPONENTS_eagle.app.v6 = \
-	user/libuser.a
+	user/libuser.a \
+	gdbstub/libgdbstub.a
 
 
 LINKFLAGS_eagle.app.v6 = \
