@@ -44,8 +44,7 @@ GEN_IMAGES= eagle.app.v6.out
 GEN_BINS= eagle.app.v6.bin
 SPECIAL_MKTARGETS=$(APP_MKTARGETS)
 SUBDIRS=    \
-	user    \
-	gdbstub
+	user
 
 endif # } PDIR
 
@@ -85,9 +84,7 @@ blankflash:
 	$(ESPTOOL) $(ESPTOOL_OPTS) write_flash $(ESPTOOL_FLASHDEF) 0xFE000 "$(SDK_PATH)/bin/blank.bin" 0xFF000 $(SDK_PATH)/bin/esp_init_data_default.bin
 
 COMPONENTS_eagle.app.v6 = \
-	user/libuser.a \
-	gdbstub/libgdbstub.a
-
+	user/libuser.a
 
 LINKFLAGS_eagle.app.v6 = \
 	-L$(SDK_PATH)/lib        \
