@@ -25,6 +25,7 @@ some pictures of cats.
 #include "captdns.h"
 #include "webpages-espfs.h"
 #include "cgiwebsocket.h"
+#include "cgi-test.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -96,6 +97,14 @@ void myEchoWebsocketConnect(Websock *ws) {
 	ws->recvCb=myEchoWebsocketRecv;
 }
 
+CgiUploadFlashDef uploadParams={
+	.type=CGIFLASH_TYPE_FW,
+	.fw1Pos=0x1000,
+	.fw2Pos=((OTA_FLASH_SIZE_K*1024)/2)+0x1000,
+	.fwSize=((OTA_FLASH_SIZE_K*1024)/2)-0x1000,
+	.tagName=OTA_TAGNAME
+};
+
 
 /*
 This is the main url->function dispatching data struct.
@@ -114,7 +123,10 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"/led.tpl", cgiEspFsTemplate, tplLed},
 	{"/index.tpl", cgiEspFsTemplate, tplCounter},
 	{"/led.cgi", cgiLed, NULL},
+	{"/flash/", cgiRedirect, "/flash/index.html"},
 	{"/flash/download", cgiReadFlash, NULL},
+	{"/flash/next", cgiGetFirmwareNext, &uploadParams},
+	{"/flash/upload", cgiUploadFirmware, &uploadParams},
 	{"/flash/reboot", cgiRebootFirmware, NULL},
 
 	//Routines to make the /wifi URL and everything beneath it work.
@@ -132,6 +144,10 @@ HttpdBuiltInUrl builtInUrls[]={
 
 	{"/websocket/ws.cgi", cgiWebsocket, myWebsocketConnect},
 	{"/websocket/echo.cgi", cgiWebsocket, myEchoWebsocketConnect},
+
+	{"/test", cgiRedirect, "/test/index.html"},
+	{"/test/", cgiRedirect, "/test/index.html"},
+	{"/test/test.cgi", cgiTestbed, NULL},
 
 	{"*", cgiEspFsHook, NULL}, //Catch-all cgi function for the filesystem
 	{NULL, NULL, NULL}

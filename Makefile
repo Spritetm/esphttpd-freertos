@@ -21,6 +21,9 @@ SPI_SPEED=40
 SPI_MODE=DIO
 SPI_SIZE_MAP=4
 
+#Tag for OTA images. 0-27 characters. Change to eg your projects title.
+OTA_TAGNAME ?= generic
+
 
 ESPTOOL ?= esptool.py
 ESPPORT ?= /dev/ttyUSB0
@@ -36,8 +39,10 @@ ESPTOOL_SIZE=$(call maplookup,$(SPI_SIZE_MAP),0:4m 2:8m 3:16m 4:32m 5:16m 6:32m)
 ESPTOOL_MODE=$(call maplookup,$(SPI_MODE),QIO:qio QOUT:qout DIO:dio DOUT:dout)
 ESPTOOL_FLASHDEF=--flash_freq $(SPI_SPEED)m --flash_mode $(ESPTOOL_MODE) --flash_size $(ESPTOOL_SIZE)
 ESPTOOL_OPTS=--port $(ESPPORT) --baud $(ESPBAUD)
+OTA_FLASH_SIZE_K=$(call maplookup,$(SPI_SIZE_MAP),0:4096 2:8192 3:16384 4:32768 5:16384 6:32768)
 
-#EXTRA_CCFLAGS += -u
+EXTRA_CCFLAGS += -DOTA_FLASH_SIZE_K=$(OTA_FLASH_SIZE_K) -DOTA_TAGNAME="\"$(OTA_TAGNAME)\""
+
 
 ifndef PDIR # {
 GEN_IMAGES= eagle.app.v6.out
