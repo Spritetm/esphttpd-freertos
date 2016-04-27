@@ -123,9 +123,7 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"/index.tpl", cgiEspFsTemplate, tplCounter},
 	{"/led.cgi", cgiLed, NULL},
 #ifndef ESP32
-	{"/flash.bin", cgiReadFlash, NULL},
 	{"/flash/", cgiRedirect, "/flash/index.html"},
-	{"/flash/download", cgiReadFlash, NULL},
 	{"/flash/next", cgiGetFirmwareNext, &uploadParams},
 	{"/flash/upload", cgiUploadFirmware, &uploadParams},
 	{"/flash/reboot", cgiRebootFirmware, NULL},
