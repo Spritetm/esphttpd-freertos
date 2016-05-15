@@ -54,19 +54,15 @@ int myPassFn(HttpdConnData *connData, int no, char *user, int userLen, char *pas
 static os_timer_t websockTimer;
 
 //Broadcast the uptime in seconds every second over connected websockets
-/*
-This Does Not Work under Freertos, presumably because this can be called in any random Freertos
-context. The correct way to fix this would be to use a queue to do inter-task communications between
-the webserver and other tasks. That's not supported under esphttpd yet, unfortunately. For now, this
-code is disabled and similar code won't work. If you know of a way to fix this in a simple way, feel
-free to poke me - Jeroen
-*/
-static void websockTimerCb(void *arg) {
+static void websocketBcast(void *arg) {
 	static int ctr=0;
 	char buff[128];
-	ctr++;
-	sprintf(buff, "Up for %d minutes %d seconds!\n", ctr/60, ctr%60);
-	cgiWebsockBroadcast("/websocket/ws.cgi", buff, strlen(buff), WEBSOCK_FLAG_NONE);
+	while(1) {
+		ctr++;
+		sprintf(buff, "Up for %d minutes %d seconds!\n", ctr/60, ctr%60);
+		cgiWebsockBroadcast("/websocket/ws.cgi", buff, strlen(buff), WEBSOCK_FLAG_NONE);
+		vTaskDelay(1000/portTICK_RATE_MS);
+	}
 }
 
 //On reception of a message, send "You sent: " plus whatever the other side sent
@@ -193,11 +189,7 @@ void user_init(void) {
 	espFsInit((void*)(webpages_espfs_start));
 	httpdInit(builtInUrls, 80);
 
-/*
-	os_timer_disarm(&websockTimer);
-	os_timer_setfn(&websockTimer, websockTimerCb, NULL);
-	os_timer_arm(&websockTimer, 1000, 1);
-*/
+	xTaskCreate(websocketBcast, "wsbcast", 300, NULL, 3, NULL);
 
 	printf("\nReady\n");
 }
