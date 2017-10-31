@@ -12,7 +12,7 @@ Cgi routines as used by the tests in the html/test subdirectory.
  */
 
 
-#include <esp8266.h>
+#include <libesphttpd/esp.h>
 #include "cgi-test.h"
 
 
@@ -22,7 +22,7 @@ typedef struct {
 } TestbedState;
 
 
-int ICACHE_FLASH_ATTR cgiTestbed(HttpdConnData *connData) {
+CgiStatus ICACHE_FLASH_ATTR cgiTestbed(HttpdConnData *connData) {
 	char buff[1024];
 	int first=0;
 	int l, x;
@@ -37,7 +37,7 @@ int ICACHE_FLASH_ATTR cgiTestbed(HttpdConnData *connData) {
 	if (state==NULL) {
 		//First call
 		state=malloc(sizeof(TestbedState));
-		memset(state, 0, sizeof(state));
+		memset(state, 0, sizeof(TestbedState));
 		connData->cgiData=state;
 		first=1;
 	}

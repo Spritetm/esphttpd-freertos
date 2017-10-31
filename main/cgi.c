@@ -13,7 +13,7 @@ flash as a binary. Also handles the hit counter on the main page.
  */
 
 
-#include <esp8266.h>
+#include <libesphttpd/esp.h>
 #include "cgi.h"
 #include "io.h"
 
@@ -22,10 +22,10 @@ flash as a binary. Also handles the hit counter on the main page.
 static char currLedState=0;
 
 //Cgi that turns the LED on or off according to the 'led' param in the POST data
-int ICACHE_FLASH_ATTR cgiLed(HttpdConnData *connData) {
+CgiStatus ICACHE_FLASH_ATTR cgiLed(HttpdConnData *connData) {
 	int len;
 	char buff[1024];
-	
+
 	if (connData->conn==NULL) {
 		//Connection aborted. Clean up.
 		return HTTPD_CGI_DONE;
@@ -44,7 +44,7 @@ int ICACHE_FLASH_ATTR cgiLed(HttpdConnData *connData) {
 
 
 //Template code for the led page.
-int ICACHE_FLASH_ATTR tplLed(HttpdConnData *connData, char *token, void **arg) {
+CgiStatus ICACHE_FLASH_ATTR tplLed(HttpdConnData *connData, char *token, void **arg) {
 	char buff[128];
 	if (token==NULL) return HTTPD_CGI_DONE;
 
@@ -63,7 +63,7 @@ int ICACHE_FLASH_ATTR tplLed(HttpdConnData *connData, char *token, void **arg) {
 static int hitCounter=0;
 
 //Template code for the counter on the index page.
-int ICACHE_FLASH_ATTR tplCounter(HttpdConnData *connData, char *token, void **arg) {
+CgiStatus ICACHE_FLASH_ATTR tplCounter(HttpdConnData *connData, char *token, void **arg) {
 	char buff[128];
 	if (token==NULL) return HTTPD_CGI_DONE;
 
