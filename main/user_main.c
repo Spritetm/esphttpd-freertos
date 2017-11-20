@@ -133,14 +133,13 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"/led.tpl", cgiEspFsTemplate, tplLed},
 	{"/index.tpl", cgiEspFsTemplate, tplCounter},
 	{"/led.cgi", cgiLed, NULL},
-#ifndef ESP32
+
 	{"/flash/", cgiRedirect, "/flash/index.html"},
 	{"/flash/next", cgiGetFirmwareNext, &uploadParams},
 	{"/flash/upload", cgiUploadFirmware, &uploadParams},
 	{"/flash/reboot", cgiRebootFirmware, NULL},
-#endif
-	//Routines to make the /wifi URL and everything beneath it work.
 
+	//Routines to make the /wifi URL and everything beneath it work.
 //Enable the line below to protect the WiFi configuration with an username/password combo.
 //	{"/wifi/*", authBasic, myPassFn},
 
