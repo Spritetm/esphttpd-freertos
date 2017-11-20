@@ -1,9 +1,9 @@
 /*
  * ----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
- * Jeroen Domburg <jeroen@spritesmods.com> wrote this file. As long as you retain 
- * this notice you can do whatever you want with this stuff. If we meet some day, 
- * and you think this stuff is worth it, you can buy me a beer in return. 
+ * Jeroen Domburg <jeroen@spritesmods.com> wrote this file. As long as you retain
+ * this notice you can do whatever you want with this stuff. If we meet some day,
+ * and you think this stuff is worth it, you can buy me a beer in return.
  * ----------------------------------------------------------------------------
  */
 
@@ -241,7 +241,7 @@ void ICACHE_FLASH_ATTR init_wifi(bool modeAP) {
 
 	if(modeAP) {
 		ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_AP) );
-		
+
 		wifi_config_t ap_config;
 		strcpy((char*)(&ap_config.ap.ssid), "ESP");
 		ap_config.ap.ssid_len = 3;
@@ -250,7 +250,7 @@ void ICACHE_FLASH_ATTR init_wifi(bool modeAP) {
 		ap_config.ap.ssid_hidden = 0;
 		ap_config.ap.max_connection = 1;
 		ap_config.ap.beacon_interval = 100;
-		
+
 		esp_wifi_set_config(WIFI_IF_AP, &ap_config);
 	}
 	else {
