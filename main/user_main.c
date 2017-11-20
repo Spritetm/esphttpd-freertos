@@ -133,6 +133,7 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"/index.tpl", cgiEspFsTemplate, tplCounter},
 	{"/led.cgi", cgiLed, NULL},
 
+	{"/flash", cgiRedirect, "/flash/index.html"},
 	{"/flash/", cgiRedirect, "/flash/index.html"},
 	{"/flash/next", cgiGetFirmwareNext, &uploadParams},
 	{"/flash/upload", cgiUploadFirmware, &uploadParams},
@@ -150,6 +151,7 @@ HttpdBuiltInUrl builtInUrls[]={
 	{"/wifi/connstatus.cgi", cgiWiFiConnStatus, NULL},
 	{"/wifi/setmode.cgi", cgiWiFiSetMode, NULL},
 
+	{"/websocket", cgiRedirect, "/websocket/index.html"},
 	{"/websocket/ws.cgi", cgiWebsocket, myWebsocketConnect},
 	{"/websocket/echo.cgi", cgiWebsocket, myEchoWebsocketConnect},
 
