@@ -8,9 +8,8 @@
  */
 
 /*
-This is example code for the esphttpd library. It's a small-ish demo showing off 
-the server, including WiFi connection management capabilities, some IO and
-some pictures of cats.
+This is example code for the esphttpd library. It's a small-ish demo showing off
+the server, including WiFi connection management capabilities, some IO etc.
 */
 
 #include <libesphttpd/esp.h>
