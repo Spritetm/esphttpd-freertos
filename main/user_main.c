@@ -311,6 +311,7 @@ void user_init(void) {
 	                  connectionMemory,
 	                  MAX_CONNECTIONS,
 	                  HTTPD_FLAG_NONE);
+	httpdFreertosStart(&httpdFreertosInstance);
 
 	init_wifi(true); // Supply false for STA mode
 
