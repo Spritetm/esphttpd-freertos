@@ -9,7 +9,7 @@
  */
 
 
-#include <esp8266.h>
+#include <libesphttpd/esp.h>
 
 #define LEDGPIO 2
 #define BTNGPIO 0

@@ -1,26 +1,24 @@
 <html>
-<head><title>Esp8266 web server</title>
+<head><title>libesphttpd web server example</title>
 <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
 <div id="main">
-<h1>It Works</h1>
+<h1>Welcome to the libesphttpd webserver example!</h1>
 <p>
-If you see this, it means the tiny li'l website in your ESP8266 does actually work. Fyi, this page has
-been loaded <b>%counter%</b> times.
+You can find this <a href="https://github.com/chmorgan/esphttpd-freertos">example here on github</a>.<br/>
+The github repository for <a href="https://github.com/chmorgan/libesphttpd">libesphttpd can be found here</a>.<br/>
+<h2>Example functionality in this test server:</h2>
 <ul>
-<li>If you haven't connected this device to your WLAN network now, you can <a href="/wifi">do so.</a></li>
-<li>You can also control the <a href="led.tpl">LED</a>.</li>
-<li>Esphttpd now also supports <a href="websocket/index.html">websockets</a>.</li>
-<li>Test esphttpd using the built-in <a href="test/">test suite</a></li>
-<li>And because I can, here's a link to my <a href="http://spritesmods.com/?f=esphttpd">website</a></ul>
+<li><a href="/wifi">Configure your WIFI network</a> (NOTE: Not currently supported for ESP32, pull requests welcome!)</li>
+<li><a href="/flash">Perform an OTA firmware upgrade</a></li>
+<li><a href="/websocket">Websocket example</a></li>
+<li><a href="/test">Run a test suite against the libesphttpd server</a></li>
+<li><a href="led.tpl">Control a gpio/led</a></li>
 </ul>
 </p>
-
-<p>And because we're on the Internets now, here are the required pictures of cats:<br />
-<img src="cats/cross-eyed-cat.jpg"><br />
-<img src="cats/junge-katze-iv.jpg"><br />
-<img src="cats/kitten-loves-toy.jpg"><br />
-</p>
+libesphttpd also supports https/ssl, configurable as a build time option.<br/>
+<br/>
+Page has been loaded <b>%counter%</b> times.
 </div>
 </body></html>

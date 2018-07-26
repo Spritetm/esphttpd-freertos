@@ -12,7 +12,7 @@ Cgi routines as used by the tests in the html/test subdirectory.
  */
 
 
-#include <esp8266.h>
+#include <libesphttpd/esp.h>
 #include "cgi-test.h"
 
 
@@ -22,13 +22,13 @@ typedef struct {
 } TestbedState;
 
 
-int ICACHE_FLASH_ATTR cgiTestbed(HttpdConnData *connData) {
+CgiStatus ICACHE_FLASH_ATTR cgiTestbed(HttpdConnData *connData) {
 	char buff[1024];
 	int first=0;
 	int l, x;
 	TestbedState *state=(TestbedState*)connData->cgiData;
 
-	if (connData->conn==NULL) {
+	if (connData->isConnectionClosed) {
 		//Connection aborted. Clean up.
 		if (state) free(state);
 		return HTTPD_CGI_DONE;
@@ -37,7 +37,7 @@ int ICACHE_FLASH_ATTR cgiTestbed(HttpdConnData *connData) {
 	if (state==NULL) {
 		//First call
 		state=malloc(sizeof(TestbedState));
-		memset(state, 0, sizeof(state));
+		memset(state, 0, sizeof(TestbedState));
 		connData->cgiData=state;
 		first=1;
 	}
@@ -69,15 +69,15 @@ int ICACHE_FLASH_ATTR cgiTestbed(HttpdConnData *connData) {
 		}
 	}
 	if (connData->requestType==HTTPD_METHOD_POST) {
-		if (connData->post->len!=connData->post->received) {
+		if (connData->post.len!=connData->post.received) {
 			//Still receiving data. Ignore this.
-			printf("Test: got %d/%d bytes\n", connData->post->received, connData->post->len);
+			printf("Test: got %d/%d bytes\n", connData->post.received, connData->post.len);
 			return HTTPD_CGI_MORE;
 		} else {
 			httpdStartResponse(connData, 200);
 			httpdHeader(connData, "content-type", "text/plain");
 			httpdEndHeaders(connData);
-			l=sprintf(buff, "%d", connData->post->received);
+			l=sprintf(buff, "%d", connData->post.received);
 			httpdSend(connData, buff, l);
 			return HTTPD_CGI_DONE;
 		}
